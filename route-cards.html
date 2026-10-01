@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>路线打印卡生成</title>
+  <link rel="stylesheet" href="/css/route-cards.css">
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Route Print Card</p>
+      <h1>路线打印卡生成</h1>
+      <p class="lede">服务端统一 A4 版式；提交前估算容量，长路线使用明确摘要规则，绝不靠缩小字号硬塞。</p>
+    </div>
+    <div class="header-note">
+      <strong>单页 A4 竖版</strong>
+      <span>无地图图像 · 嵌入中文字体 · 冻结版本</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel form-panel" aria-labelledby="formTitle">
+      <h2 id="formTitle">1. 选择内容</h2>
+      <form id="cardForm">
+        <label class="field">
+          <span>路线版本</span>
+          <select id="routeVersion" required></select>
+        </label>
+
+        <div class="field">
+          <span class="field-label">步行方式</span>
+          <div class="segmented" role="radiogroup" aria-label="步行方式">
+            <label><input type="radio" name="walkingMode" value="leisure"> <span>轻松步行</span></label>
+            <label><input type="radio" name="walkingMode" value="standard" checked> <span>常规步行</span></label>
+            <label><input type="radio" name="walkingMode" value="fast"> <span>快速轻装</span></label>
+          </div>
+        </div>
+
+        <fieldset class="field">
+          <legend>可选字段</legend>
+          <p class="hint">起终点、撤出点、注意事项、用时依据为必需信息，不能取消。</p>
+          <div class="check-grid">
+            <label><input type="checkbox" name="fields" value="terrain" checked> 地形</label>
+            <label><input type="checkbox" name="fields" value="waypoints" checked> 路点明细</label>
+            <label><input type="checkbox" name="fields" value="facilities" checked> 厕所/饮水</label>
+            <label><input type="checkbox" name="fields" value="sources" checked> 公开来源</label>
+          </div>
+        </fieldset>
+
+        <div class="field">
+          <span class="field-label">摘要规则</span>
+          <div class="rules">
+            <label class="rule-card">
+              <input type="radio" name="summaryRule" value="essential" checked>
+              <strong>关键岔路优先</strong>
+              <small>保留关键岔路；最多 4 条近期厕所/饮水、2 条来源。</small>
+            </label>
+            <label class="rule-card">
+              <input type="radio" name="summaryRule" value="landmarks">
+              <strong>路标间隔抽样</strong>
+              <small>关键岔路加等距抽样，最多 7 个路点、6 条设施、4 条来源。</small>
+            </label>
+            <label class="rule-card">
+              <input type="radio" name="summaryRule" value="full">
+              <strong>完整列出</strong>
+              <small>不主动省略；若单页仍装不下则拒绝提交。</small>
+            </label>
+          </div>
+        </div>
+
+        <div id="estimate" class="estimate" aria-live="polite">
+          <p>请选择路线后估算单页容量。</p>
+        </div>
+
+        <div class="actions">
+          <button type="button" id="estimateBtn" class="btn secondary">重新估算</button>
+          <button type="submit" id="submitBtn" class="btn primary" disabled>生成单页 PDF 任务</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel preview-panel" aria-labelledby="previewTitle">
+      <div class="panel-head">
+        <h2 id="previewTitle">2. 服务端内容预览</h2>
+        <span>与 PDF 使用同一冻结/待生成内容模型</span>
+      </div>
+      <div class="preview-frame-wrap">
+        <iframe id="previewFrame" title="路线卡 A4 预览" src="about:blank"></iframe>
+      </div>
+    </section>
+  </main>
+
+  <section class="panel jobs-panel" aria-labelledby="jobsTitle">
+    <div class="panel-head">
+      <h2 id="jobsTitle">3. 我的生成任务（可恢复）</h2>
+      <button type="button" id="refreshJobs" class="btn tiny">刷新</button>
+    </div>
+    <div id="jobsList" class="jobs-list"></div>
+  </section>
+
+  <template id="jobTemplate">
+    <article class="job-card">
+      <div class="job-main">
+        <h3></h3>
+        <p class="job-meta"></p>
+        <p class="job-status"></p>
+      </div>
+      <div class="job-actions">
+        <a target="_blank" rel="noopener" class="btn tiny">查看冻结预览</a>
+        <button type="button" class="btn tiny primary download">重新鉴权并下载</button>
+      </div>
+    </article>
+  </template>
+
+  <script src="/js/route-cards.js"></script>
+</body>
+</html>

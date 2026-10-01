@@ -1,0 +1,20 @@
+{
+  "name": "route-print-card-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "服务端统一渲染的路线打印卡生成服务",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "check": "node --check src/server.js && node --check src/layout.js && node --check src/render-pdf.js && node --check src/render-html.js && node --check src/store.js && node --check src/routes-data.js",
+    "test": "node test/acceptance.test.js"
+  },
+  "dependencies": {
+    "@expo-google-fonts/noto-sans-sc": "^0.4.3",
+    "express": "^4.22.3",
+    "pdf-parse": "^2.4.5",
+    "pdfkit": "^0.20.2",
+    "pg": "^8.23.1"
+  }
+}
