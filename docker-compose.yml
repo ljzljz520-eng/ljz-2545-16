@@ -1,31 +1,52 @@
-version: '3.8'
-
 services:
-  web:
+  db:
+    image: postgres:16-alpine
+    container_name: route-card-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: routecard
+      POSTGRES_USER: routecard
+      POSTGRES_PASSWORD: routecard
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U routecard -d routecard"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - route-card
+
+  app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: smartlearn-web
-    ports:
-      - "8080:80"
+    container_name: route-card-app
     restart: unless-stopped
-    volumes:
-      # 开发模式：挂载本地文件，修改后自动生效
-      - ./index.html:/usr/share/nginx/html/index.html
-      - ./courses.html:/usr/share/nginx/html/courses.html
-      - ./plan.html:/usr/share/nginx/html/plan.html
-      - ./resources.html:/usr/share/nginx/html/resources.html
-      - ./profile.html:/usr/share/nginx/html/profile.html
-      - ./about.html:/usr/share/nginx/html/about.html
-      - ./contact.html:/usr/share/nginx/html/contact.html
-      - ./demo.html:/usr/share/nginx/html/demo.html
-      - ./css:/usr/share/nginx/html/css
-      - ./js:/usr/share/nginx/html/js
-    networks:
-      - smartlearn-network
+    depends_on:
+      db:
+        condition: service_healthy
     environment:
-      - TZ=Asia/Shanghai
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgres://routecard:routecard@db:5432/routecard
+      CARD_FILE_DIR: /app/data/generated
+      AUTO_MIGRATE: "true"
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: change-me
+      SESSION_SECRET: change-this-session-secret-to-a-random-32-byte-value
+      DOWNLOAD_SECRET: change-this-download-secret-to-a-random-32-byte-value
+    ports:
+      - "3000:3000"
+    volumes:
+      - cardfiles:/app/data/generated
+    networks:
+      - route-card
+
+volumes:
+  pgdata:
+  cardfiles:
 
 networks:
-  smartlearn-network:
+  route-card:
     driver: bridge

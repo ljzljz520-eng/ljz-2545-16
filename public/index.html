@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>路线打印卡生成任务</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+  <header class="app-header">
+    <div>
+      <p class="eyebrow">服务端 PDF · 单页冻结版</p>
+      <h1>路线打印卡生成任务</h1>
+      <p class="subtitle">提交前估算容量；起终点、退出点、注意事项始终保留，不靠缩小文字硬塞。</p>
+    </div>
+    <section class="login-card" aria-labelledby="loginTitle">
+      <h2 id="loginTitle">重新鉴权</h2>
+      <form id="loginForm" class="login-form">
+        <input id="username" name="username" autocomplete="username" placeholder="管理员账号" required>
+        <input id="password" name="password" type="password" autocomplete="current-password" placeholder="密码" required>
+        <button type="submit">登录</button>
+      </form>
+      <p id="authState" class="muted">未登录：可选择路线和试算，创建/下载需登录。</p>
+    </section>
+  </header>
+
+  <main class="layout">
+    <section class="panel form-panel">
+      <h2>1. 选择路线与版式</h2>
+      <label class="field">
+        <span>路线版本</span>
+        <select id="routeSelect" required>
+          <option value="">正在加载路线…</option>
+        </select>
+      </label>
+
+      <div class="route-meta" id="routeMeta">选择路线后显示版本和信息日期。</div>
+
+      <fieldset class="field">
+        <legend>纸张（仅标准单页；拒绝窄纸张）</legend>
+        <label><input type="radio" name="pageSize" value="A4" checked> A4 纵向</label>
+        <label><input type="radio" name="pageSize" value="LETTER"> Letter 纵向</label>
+      </fieldset>
+
+      <fieldset class="field">
+        <legend>步行方式（估算用时会标明依据）</legend>
+        <div id="walkingModes" class="option-list"></div>
+      </fieldset>
+
+      <fieldset class="field">
+        <legend>2. 选择字段</legend>
+        <div id="fieldOptions" class="checkbox-grid"></div>
+      </fieldset>
+
+      <fieldset class="field summary-field">
+        <legend>3. 溢出时使用明确摘要规则</legend>
+        <div id="summaryRules" class="option-list"></div>
+        <label class="acknowledge">
+          <input id="ackSummary" type="checkbox">
+          <span>我确认：摘要会折叠已注明的可选内容；起终点、退出点和注意事项不会被静默丢弃。</span>
+        </label>
+      </fieldset>
+
+      <div class="actions">
+        <button id="estimateBtn" type="button" class="secondary">重新估算容量</button>
+        <button id="submitBtn" type="button" class="primary" disabled>提交生成任务</button>
+      </div>
+      <div id="formMessage" class="form-message" role="alert"></div>
+    </section>
+
+    <section class="panel estimate-panel">
+      <h2>提交前容量估算</h2>
+      <div id="estimate" class="estimate-empty">选择路线和字段后自动试算。</div>
+      <h2>服务端统一版式预览</h2>
+      <div class="preview-toolbar">
+        <button id="refreshPreview" type="button" class="secondary small-btn" disabled>刷新内容对应预览</button>
+        <a id="pdfPreviewLink" class="button-like secondary small-btn disabled" target="_blank" rel="noopener">在新窗口看 PDF 预览</a>
+      </div>
+      <iframe id="previewFrame" title="服务端渲染的路线卡 HTML 预览" sandbox="allow-scripts"></iframe>
+    </section>
+  </main>
+
+  <section class="panel tasks-panel">
+    <h2>可恢复任务</h2>
+    <p class="muted">服务进程重启会把“生成中”任务重新排队；下载链接短时有效且一次性使用，需要重新鉴权签发。</p>
+    <div id="taskList" class="task-list">登录后显示最近任务。</div>
+  </section>
+
+  <template id="taskTemplate">
+    <article class="task-item">
+      <div>
+        <strong class="task-title"></strong>
+        <p class="task-meta"></p>
+      </div>
+      <div class="task-actions">
+        <a class="task-preview button-like secondary" target="_blank" rel="noopener">查看冻结预览</a>
+        <button type="button" class="task-download secondary">重新鉴权下载</button>
+        <span class="task-status"></span>
+      </div>
+    </article>
+  </template>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
